@@ -1,0 +1,20 @@
+#ifndef PROFESSIONAL_H
+#define PROFESSIONAL_H
+#include "common.h"
+#include "service.h"
+typedef struct PROFESSIONAL_NODE{
+    int professionalId;
+    char name[NAME_SIZE];
+    int pincode;
+    char contact[PHONE_SIZE];
+    Availability Status;
+    ServiceNode* services[MAX_SERVICES];
+    int serviceCount;
+
+    struct PROFESSIONAL_NODE*next;
+
+}ProfessionalNode;
+ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact);
+ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ProfessionalNode*Pnode);
+ProfessionalNode* FindProfessional(ProfessionalNode*head,int id);
+#endif
