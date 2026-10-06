@@ -4,24 +4,28 @@
 #include "professional.h"
 #include "common.h"
 ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact){
-    ProfessionalNode* Pnode=(ProfessionalNode*)malloc(sizeof(ProfessionalNode));
-    if(Pnode!=NULL){
-        Pnode->professionalId=id;
-        Pnode->pincode=pcode;
-        strcpy(Pnode->name,name);
-        strcpy(Pnode->contact,contact);
-        Pnode->Status=AVAILABLE;
-        Pnode->serviceCount=0;
-        for(int i=0;i<MAX_SERVICES;i++){
-            Pnode->services[i]=NULL;
+    ProfessionalNode*Pnode=NULL;
+    if(id<=0){
+        printf("Invalid Professional ID");
+    }
+    else{
+        Pnode=(ProfessionalNode*)malloc(sizeof(ProfessionalNode));
+        if(Pnode!=NULL){
+            Pnode->professionalId=id;
+            Pnode->pincode=pcode;
+            strcpy(Pnode->name,name);
+            strcpy(Pnode->contact,contact);
+            Pnode->Status=AVAILABLE;
+            Pnode->serviceCount=0;
+            for(int i=0;i<MAX_SERVICES;i++){
+                Pnode->services[i]=NULL;
+            }
+            Pnode->next=NULL;
         }
-
-        Pnode->next=NULL;
     }
     return Pnode;
 }
-
-ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ProfessionalNode*Pnode){
+ProfessionalNode* InsertProfessional(ProfessionalNode*head,ProfessionalNode*Pnode){
     ProfessionalNode*temp=head;
     int dublicate=0;
 
@@ -64,8 +68,8 @@ ProfessionalNode* FindProfessional(ProfessionalNode*head,int id){
     }
     return retval;
 }
-ProfessionalNode* AddServicetoProfessional(ProfessionalNode*Pnode,ServiceNode*Snode){
-     Bool added=FALSE;
+Bool AddServicetoProfessional(ProfessionalNode*Pnode,ServiceNode*Snode){
+    Bool added=FALSE;
     if(Pnode!=NULL && Snode!=NULL){
         if(Pnode->serviceCount<MAX_SERVICES){
             Pnode->services[Pnode->serviceCount]=Snode;
@@ -74,4 +78,53 @@ ProfessionalNode* AddServicetoProfessional(ProfessionalNode*Pnode,ServiceNode*Sn
         }
     }
     return added;
+}
+ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*serviceHead){
+    int id,pcode,serviceId,numberOfServices;
+    char name[NAME_SIZE],contact[PHONE_SIZE];
+    ProfessionalNode*Pnode;
+    ServiceNode*Snode;
+
+    printf("Enter Professional ID: ");
+    scanf("%d",&id);
+
+    printf("Enter Professional Name: ");
+    scanf(" %[^\n]",name);
+
+    printf("Enter Pincode: ");
+    scanf("%d",&pcode);
+
+    printf("Enter Contact Number: ");
+    scanf("%s",contact);
+
+    Pnode=CreateProfessional(id,name,pcode,contact);
+
+    if(Pnode!=NULL){
+        DisplayServices(serviceHead);
+        printf("Enter number of services: ");
+        scanf("%d",&numberOfServices);
+        if(numberOfServices<1 || numberOfServices>MAX_SERVICES){
+            printf("Invalid number of services.\n");
+            free(Pnode);
+            return head;
+        }
+        for(int i=0;i<numberOfServices;i++){
+            printf("Enter Service ID: ");
+            scanf("%d",&serviceId);
+            Snode=FindService(serviceHead,serviceId);
+
+            if(Snode==NULL){
+                printf("Invalid Service ID. Enter again.\n");
+                i--;
+            }
+            else{
+                if(AddServicetoProfessional(Pnode,Snode)==TRUE){
+                    printf("Service added successfully.\n");
+                }
+            }
+        }
+        head=InsertProfessional(head,Pnode);
+        printf("Professional added successfully.\n");
+    }
+    return head;
 }

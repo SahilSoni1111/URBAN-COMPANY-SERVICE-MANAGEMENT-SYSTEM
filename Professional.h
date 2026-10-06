@@ -15,6 +15,8 @@ typedef struct PROFESSIONAL_NODE{
 
 }ProfessionalNode;
 ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact);
-ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ProfessionalNode*Pnode);
+ProfessionalNode* InsertProfessional(ProfessionalNode*head,ProfessionalNode*Pnode);
 ProfessionalNode* FindProfessional(ProfessionalNode*head,int id);
+Bool AddServicetoProfessional(ProfessionalNode*Pnode, ServiceNode*Snode);
+ProfessionalNode* RegisterProfessional(ProfessionalNode*head, ServiceNode*serviceHead);
 #endif
