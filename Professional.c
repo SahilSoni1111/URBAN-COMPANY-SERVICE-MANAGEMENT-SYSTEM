@@ -88,7 +88,6 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
     
     printf("Enter Professional ID: ");
     scanf("%d",&id);
-
     Pnode=FindProfessional(head,id);
 
     if(Pnode!=NULL){
@@ -96,7 +95,7 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
     }
     else{
         printf("Enter Professional Name: ");
-        scanf(" %[^\n]",name);
+        scanf("%[^\n]",name);
 
         printf("Enter Pincode: ");
         scanf("%d",&pcode);
@@ -108,7 +107,6 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
 
         if(Pnode!=NULL){
             DisplayService(serviceHead);
-
             printf("Enter number of services: ");
             scanf("%d",&numberOfServices);
 
@@ -159,7 +157,7 @@ ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*ser
     ProfessionalNode*samepincode=NULL;
     ProfessionalNode*diffpincode=NULL;
     while(temp!=NULL){
-        if(temp->Status=AVAILABLE && ProfessionalProvideService(temp, service)==TRUE){
+        if(temp->Status==AVAILABLE && ProfessionalProvideService(temp, service)==TRUE){
             if(temp->pincode==customer->pincode){
                 if(samepincode==NULL)
                 samepincode=temp;

@@ -76,7 +76,7 @@ RequestNode* CreateServiceRequest(RequestNode* Rhead, ProfessionalNode* Phead, S
     ServiceNode* service=NULL;
     ProfessionalNode*professional=NULL;
     RequestNode*Rnode=NULL;
-    printf("Enter Request ID: ");
+    printf("Enter Request ID:");
     scanf("%d",&id);
 
     if(FindRequest(Rhead,id)!=NULL){
@@ -92,7 +92,6 @@ RequestNode* CreateServiceRequest(RequestNode* Rhead, ProfessionalNode* Phead, S
         else{
             printf("Enter Service ID:");
             scanf("%d",&serviceId);
-
             service=FindService(Shead,serviceId);
 
             if(service==NULL){
@@ -103,7 +102,7 @@ RequestNode* CreateServiceRequest(RequestNode* Rhead, ProfessionalNode* Phead, S
                 scanf("%s",date);
                 printf("Enter Time:");
                 scanf("%s",time);
-                professional=FindSuitableProfessional(customer,service,Phead);
+                professional=FindcorrectProfessional(customer,service,Phead);
                 Rnode=CreateRequest(id,customer,service,professional,date,time);
                 if(Rnode!=NULL){
                     if(professional!=NULL){
@@ -111,7 +110,7 @@ RequestNode* CreateServiceRequest(RequestNode* Rhead, ProfessionalNode* Phead, S
                         printf("Professional assigned successfully.\n");
                     }
                     else{
-                        printf("No suitable professional available. Request is pending.\n");
+                        printf("No suitable professional available ,request is pending.\n");
                     }
                     Rhead=InsertRequest(Rhead,Rnode);
                     printf("Service Request created successfully.\n");
