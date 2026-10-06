@@ -84,47 +84,62 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
     char name[NAME_SIZE],contact[PHONE_SIZE];
     ProfessionalNode*Pnode;
     ServiceNode*Snode;
-
+    
     printf("Enter Professional ID: ");
     scanf("%d",&id);
 
-    printf("Enter Professional Name: ");
-    scanf(" %[^\n]",name);
-
-    printf("Enter Pincode: ");
-    scanf("%d",&pcode);
-
-    printf("Enter Contact Number: ");
-    scanf("%s",contact);
-
-    Pnode=CreateProfessional(id,name,pcode,contact);
+    Pnode=FindProfessional(head,id);
 
     if(Pnode!=NULL){
-        DisplayServices(serviceHead);
-        printf("Enter number of services: ");
-        scanf("%d",&numberOfServices);
-        if(numberOfServices<1 || numberOfServices>MAX_SERVICES){
-            printf("Invalid number of services.\n");
-            free(Pnode);
-            return head;
-        }
-        for(int i=0;i<numberOfServices;i++){
-            printf("Enter Service ID: ");
-            scanf("%d",&serviceId);
-            Snode=FindService(serviceHead,serviceId);
+        printf("Professional ID already exists.\n");
+    }
+    else{
+        printf("Enter Professional Name: ");
+        scanf(" %[^\n]",name);
 
-            if(Snode==NULL){
-                printf("Invalid Service ID. Enter again.\n");
-                i--;
+        printf("Enter Pincode: ");
+        scanf("%d",&pcode);
+
+        printf("Enter Contact Number: ");
+        scanf("%s",contact);
+
+        Pnode=CreateProfessional(id,name,pcode,contact);
+
+        if(Pnode!=NULL){
+            DisplayService(serviceHead);
+
+            printf("Enter number of services: ");
+            scanf("%d",&numberOfServices);
+
+            if(numberOfServices<1 || numberOfServices>MAX_SERVICES){
+                printf("Invalid number of services.\n");
+                free(Pnode);
             }
             else{
-                if(AddServicetoProfessional(Pnode,Snode)==TRUE){
-                    printf("Service added successfully.\n");
+                for(int i=0;i<numberOfServices;i++){
+                    printf("Enter Service ID: ");
+                    scanf("%d",&serviceId);
+
+                    Snode=FindService(serviceHead,serviceId);
+
+                    if(Snode==NULL){
+                        printf("Invalid Service ID. Enter again.\n");
+                        i--;
+                    }
+                    else{
+                        if(AddServicetoProfessional(Pnode,Snode)==TRUE){
+                            printf("Service added successfully.\n");
+                        }
+                        else{
+                            printf("Not Inserted. Enter Again\n");
+                            i--;
+                        }
+                    }
                 }
+                head=InsertProfessional(head,Pnode);
+                printf("Professional added successfully.\n");
             }
         }
-        head=InsertProfessional(head,Pnode);
-        printf("Professional added successfully.\n");
     }
     return head;
 }

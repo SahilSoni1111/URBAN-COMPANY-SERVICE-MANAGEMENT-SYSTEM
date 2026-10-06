@@ -70,20 +70,27 @@ CustomerNode* RegisterCustomer(CustomerNode*head){
     printf("Enter Customer ID: ");
     scanf("%d",&id);
 
-    printf("Enter Customer Name: ");
-    scanf(" %[^\n]",name);
-
-    printf("Enter Pincode: ");
-    scanf("%d",&pcode);
-
-    printf("Enter Contact Number: ");
-    scanf("%s",phone);
-
-    Cnode=CreateCustomer(id,name,pcode,phone);
+    Cnode=FindCustomer(head,id);
 
     if(Cnode!=NULL){
-        head=InsertCustomer(head,Cnode);
-        printf("Customer added successfully.\n");
+        printf("Customer ID already exists.\n");
+    }
+    else{
+        printf("Enter Customer Name: ");
+        scanf(" %[^\n]",name);
+
+        printf("Enter Pincode: ");
+        scanf("%d",&pcode);
+
+        printf("Enter Contact Number: ");
+        scanf("%s",phone);
+        
+        Cnode=CreateCustomer(id,name,pcode,phone);
+
+        if(Cnode!=NULL){
+            head=InsertCustomer(head,Cnode);
+            printf("Customer added successfully.\n");
+        }
     }
 
     return head;

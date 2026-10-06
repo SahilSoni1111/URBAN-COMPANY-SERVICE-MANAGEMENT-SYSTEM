@@ -12,5 +12,5 @@ typedef struct CUSTOMER_NODE{
 CustomerNode* CreateCustomer(int, const char*, int , const char*);
 CustomerNode* InsertCustomer(CustomerNode* head,CustomerNode*Cnode);
 CustomerNode* FindCustomer(CustomerNode*head, int id);
-CustomerNode* RegisterCustomer();
+CustomerNode* RegisterCustomer(CustomerNode*);
 #endif

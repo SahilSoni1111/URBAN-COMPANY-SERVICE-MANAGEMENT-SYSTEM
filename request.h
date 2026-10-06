@@ -15,5 +15,7 @@ typedef struct REQUEST_NODE{
     struct REQUEST_NODE*next;
 }RequestNode;
 
-RequestNode* CreateRequest(int id,CustomerNode*customer,ServiceNode*service,const char*date,const char*time);
+RequestNode* CreateRequest(int,CustomerNode*,ServiceNode*,const char*,const char*);
+RequestNode* InsertRequest(RequestNode*,RequestNode*);
+RequestNode* FindRequest(RequestNode*,int);
 #endif

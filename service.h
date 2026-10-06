@@ -8,8 +8,10 @@ typedef struct SERVICE_NODE{
 
     struct SERVICE_NODE*next;
 } ServiceNode;
+
 ServiceNode* CreateService(int, const char*, float);
+ServiceNode* InputServices(ServiceNode* head, ServiceNode* Snode);
 ServiceNode* Insertservice(ServiceNode*, ServiceNode*);
-
-
+void DisplayService(ServiceNode*);
+ServiceNode* RegisterService(ServiceNode*head);
 #endif

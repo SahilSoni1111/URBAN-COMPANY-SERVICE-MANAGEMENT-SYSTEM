@@ -88,20 +88,28 @@ ServiceNode* InputService(ServiceNode*head){
     float price;
     char name[NAME_SIZE];
     ServiceNode*Snode;
+
     printf("Enter Service ID: ");
     scanf("%d",&id);
-
-    printf("Enter Service Name: ");
-    scanf(" %[^\n]",name);
-
-    printf("Enter Base Price: ");
-    scanf("%f",&price);
-
-    Snode=CreateService(id,name,price);
+    
+    Snode=FindService(head,id);
 
     if(Snode!=NULL){
-        head=InsertService(head,Snode);
-        printf("Service added successfully.\n");
+        printf("Service ID already exists.\n");
+    }
+    else{
+        printf("Enter Service Name: ");
+        scanf(" %[^\n]",name);
+
+        printf("Enter Base Price: ");
+        scanf("%f",&price);
+
+        Snode=CreateService(id,name,price);
+
+        if(Snode!=NULL){
+            head=InsertService(head,Snode);
+            printf("Service added successfully.\n");
+        }
     }
 
     return head;

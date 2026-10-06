@@ -3,7 +3,7 @@
 #define NAME_SIZE 50
 #define PHONE_SIZE 15
 #define MAX_SERVICES 5
-#define DATE_SIZE 10
+#define DATE_SIZE 11
 #define TIME_SIZE 10 
 typedef enum{
     FALSE,
@@ -18,5 +18,5 @@ typedef enum{
     ASSIGNED,
     COMPLETED,
     CANCELLED
-}Request_status;
+}RequestStatus;
 #endif
