@@ -18,4 +18,6 @@ typedef struct REQUEST_NODE{
 RequestNode* CreateRequest(int,CustomerNode*,ServiceNode*,const char*,const char*);
 RequestNode* InsertRequest(RequestNode*,RequestNode*);
 RequestNode* FindRequest(RequestNode*,int);
+RequestNode* CreateServiceRequest(RequestNode*, ProfessionalNode*, ServiceNode*, CustomerNode*);
+RequestNode* CompleteRequest(RequestNode*, int);
 #endif

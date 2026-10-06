@@ -120,3 +120,75 @@ RequestNode* CreateServiceRequest(RequestNode* Rhead, ProfessionalNode* Phead, S
     }
     return Rhead;
 }
+RequestNode* CompleteRequest(RequestNode*Rhead, ProfessionalNode*Phead){
+    int id;
+    RequestNode*Rnode=NULL;
+    RequestNode*nptr=Rhead;
+    ProfessionalNode*professional=NULL;
+    RequestNode*samePincode=NULL;
+    RequestNode*diffPincode=NULL;
+    int count=0;
+    printf("List of Requests still pending\n");
+
+    while(nptr!=NULL){
+        if(nptr->Rstatus==PENDING){
+            count++;
+            printf("(%d) %d\n",count ,nptr->requestId);
+        }
+        nptr=nptr->next;
+    }
+    printf("Enter the Request which you want to Complete\n");
+    scanf("%d",&id);
+
+    Rnode=FindRequest(Rhead,id);
+
+    if(Rnode==NULL){
+        printf("Request ID does not exist\n");
+    }
+    else{
+        if(Rnode->Rstatus!=ASSIGNED){
+            printf("Request is not assigned\n");
+        }
+        else{
+            professional=Rnode->professional;
+            Rnode->Rstatus=COMPLETED;
+            professional->Status=AVAILABLE;
+            printf("Request completed successfully\n");
+            nptr=Rhead;
+            while(nptr!=NULL){
+                if(nptr->Rstatus==PENDING){
+                    if(ProfessionalProvideService(professional,nptr->service)==TRUE){
+                        if(nptr->customer->pincode==professional->pincode){
+                            if(samePincode==NULL){
+                                samePincode=nptr;
+                            }
+                        }
+                        else{
+                            if(diffPincode==NULL){
+                                diffPincode=nptr;
+                            }
+                        }
+                    }
+                }
+                nptr=nptr->next;
+            }
+    
+            if(samePincode!=NULL){
+                samePincode->professional=professional;
+                samePincode->Rstatus=ASSIGNED;
+                professional->Status=UNAVAILABLE;
+                printf("Pending request assigned successfully\n");
+            }
+            else if(diffPincode!=NULL){
+                diffPincode->professional=professional;
+                diffPincode->Rstatus=ASSIGNED;
+                professional->Status=UNAVAILABLE;
+                printf("Pending request assigned successfully\n");
+            }
+            else{
+                printf("No suitable pending request available\n");
+            }
+        }
+    }
+    return Rhead;
+}
