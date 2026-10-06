@@ -3,6 +3,7 @@
 #include <string.h>
 #include "professional.h"
 #include "common.h"
+#include "customer.h"
 ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact){
     ProfessionalNode*Pnode=NULL;
     if(id<=0){
@@ -119,7 +120,6 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
                 for(int i=0;i<numberOfServices;i++){
                     printf("Enter Service ID: ");
                     scanf("%d",&serviceId);
-
                     Snode=FindService(serviceHead,serviceId);
 
                     if(Snode==NULL){
@@ -142,4 +142,37 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
         }
     }
     return head;
+}
+Bool ProfessionalProvideService(ProfessionalNode*pnode, ServiceNode*Snode){
+    Bool found=FALSE;
+    if(pnode!=NULL && Snode!=NULL){
+        for(int i=0; i<pnode->serviceCount && !found; i++){
+            if(pnode->services[i]==Snode){
+                found=TRUE;
+            }
+        }
+    }
+    return found;
+}
+ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*service, ProfessionalNode*head){
+    ProfessionalNode*temp=head;
+    ProfessionalNode*samepincode=NULL;
+    ProfessionalNode*diffpincode=NULL;
+    while(temp!=NULL){
+        if(temp->Status=AVAILABLE && ProfessionalProvideService(temp, service)==TRUE){
+            if(temp->pincode==customer->pincode){
+                if(samepincode==NULL)
+                samepincode=temp;
+            }
+            else{
+                if(diffpincode==NULL)
+                diffpincode=temp;
+            }
+        }
+        temp=temp->next;
+    }
+    ProfessionalNode*retval=NULL;
+    if(samepincode!=NULL) retval=samepincode;
+    else retval=diffpincode;
+    return retval;
 }

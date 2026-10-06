@@ -19,4 +19,6 @@ ProfessionalNode* InsertProfessional(ProfessionalNode*head,ProfessionalNode*Pnod
 ProfessionalNode* FindProfessional(ProfessionalNode*head,int id);
 Bool AddServicetoProfessional(ProfessionalNode*Pnode, ServiceNode*Snode);
 ProfessionalNode* RegisterProfessional(ProfessionalNode*head, ServiceNode*serviceHead);
+Bool ProfessionalProvideService(ProfessionalNode*pnode, ServiceNode*Snode);
+ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*service, ProfessionalNode*head)
 #endif
