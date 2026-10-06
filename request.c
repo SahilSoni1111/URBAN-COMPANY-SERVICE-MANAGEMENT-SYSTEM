@@ -139,9 +139,7 @@ RequestNode* CompleteRequest(RequestNode*Rhead, ProfessionalNode*Phead){
     }
     printf("Enter the Request which you want to Complete\n");
     scanf("%d",&id);
-
     Rnode=FindRequest(Rhead,id);
-
     if(Rnode==NULL){
         printf("Request ID does not exist\n");
     }
@@ -172,7 +170,6 @@ RequestNode* CompleteRequest(RequestNode*Rhead, ProfessionalNode*Phead){
                 }
                 nptr=nptr->next;
             }
-    
             if(samePincode!=NULL){
                 samePincode->professional=professional;
                 samePincode->Rstatus=ASSIGNED;
