@@ -120,26 +120,24 @@ RequestNode* CreateServiceRequest(RequestNode* Rhead, ProfessionalNode* Phead, S
     }
     return Rhead;
 }
-RequestNode* CompleteRequest(RequestNode*Rhead, ProfessionalNode*Phead){
+RequestNode* CompleteRequest(RequestNode*Rhead){
     int id;
+    int count=0;
     RequestNode*Rnode=NULL;
     RequestNode*nptr=Rhead;
     ProfessionalNode*professional=NULL;
-    RequestNode*samePincode=NULL;
-    RequestNode*diffPincode=NULL;
-    int count=0;
-    printf("List of Requests still pending\n");
+    printf("List of Requests\n");
 
     while(nptr!=NULL){
-        if(nptr->Rstatus==PENDING){
-            count++;
-            printf("(%d) %d\n",count ,nptr->requestId);
-        }
+        count++;
+        printf("(%d) Request ID: %d  Service: %s\n",count,nptr->requestId,nptr->service->serviceName);
         nptr=nptr->next;
     }
     printf("Enter the Request which you want to Complete\n");
     scanf("%d",&id);
+
     Rnode=FindRequest(Rhead,id);
+
     if(Rnode==NULL){
         printf("Request ID does not exist\n");
     }
@@ -152,38 +150,49 @@ RequestNode* CompleteRequest(RequestNode*Rhead, ProfessionalNode*Phead){
             Rnode->Rstatus=COMPLETED;
             professional->Status=AVAILABLE;
             printf("Request completed successfully\n");
-            nptr=Rhead;
-            while(nptr!=NULL){
-                if(nptr->Rstatus==PENDING){
-                    if(ProfessionalProvideService(professional,nptr->service)==TRUE){
-                        if(nptr->customer->pincode==professional->pincode){
-                            if(samePincode==NULL){
-                                samePincode=nptr;
-                            }
-                        }
-                        else{
-                            if(diffPincode==NULL){
-                                diffPincode=nptr;
-                            }
-                        }
-                    }
-                }
-                nptr=nptr->next;
+            Rhead=AssignPendingRequest(Rhead,professional);
+        }
+    }
+    return Rhead;
+}
+RequestNode* CancelRequest(RequestNode*Rhead){
+    int id;
+    int count=0;
+    RequestNode*Rnode=NULL;
+    RequestNode*nptr=Rhead;
+    ProfessionalNode*professional=NULL;
+    printf("List of Requests\n");
+    while(nptr!=NULL){
+        count++;
+        printf("(%d) Request ID: %d  Service: %s\n",count,nptr->requestId,nptr->service->serviceName);
+        nptr=nptr->next;
+    }
+    printf("Enter the Request which you want to Cancel\n");
+    scanf("%d",&id);
+
+    Rnode=FindRequest(Rhead,id);
+
+    if(Rnode==NULL){
+        printf("Request ID does not exist\n");
+    }
+    else{
+        if(Rnode->Rstatus==COMPLETED){
+            printf("Completed request cannot be cancelled\n");
+        }
+        else if(Rnode->Rstatus==CANCELLED){
+            printf("Request is already cancelled\n");
+        }
+        else{
+            if(Rnode->Rstatus==ASSIGNED){
+                professional=Rnode->professional;
+                professional->Status=AVAILABLE;
             }
-            if(samePincode!=NULL){
-                samePincode->professional=professional;
-                samePincode->Rstatus=ASSIGNED;
-                professional->Status=UNAVAILABLE;
-                printf("Pending request assigned successfully\n");
-            }
-            else if(diffPincode!=NULL){
-                diffPincode->professional=professional;
-                diffPincode->Rstatus=ASSIGNED;
-                professional->Status=UNAVAILABLE;
-                printf("Pending request assigned successfully\n");
-            }
-            else{
-                printf("No suitable pending request available\n");
+
+            Rnode->Rstatus=CANCELLED;
+            printf("Request cancelled successfully\n");
+
+            if(professional!=NULL){
+                Rhead=AssignPendingRequest(Rhead,professional);
             }
         }
     }

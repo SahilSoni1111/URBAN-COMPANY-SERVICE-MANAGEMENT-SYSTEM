@@ -4,6 +4,7 @@
 #include "professional.h"
 #include "common.h"
 #include "customer.h"
+#include "request.h"
 ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact){
     ProfessionalNode*Pnode=NULL;
     if(id<=0){
@@ -173,4 +174,112 @@ ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*ser
     if(samepincode!=NULL) retval=samepincode;
     else retval=diffpincode;
     return retval;
+}
+RequestNode* AssignPendingRequest(RequestNode*Rhead,ProfessionalNode*professional){
+    RequestNode*nptr=Rhead;
+    RequestNode*samePincode=NULL;
+    RequestNode*diffPincode=NULL;
+
+    while(nptr!=NULL){
+        if(nptr->Rstatus==PENDING){
+            if(ProfessionalProvideService(professional,nptr->service)==TRUE){
+                if(nptr->customer->pincode==professional->pincode){
+                    if(samePincode==NULL){
+                        samePincode=nptr;
+                    }
+                }
+                else{
+                    if(diffPincode==NULL){
+                        diffPincode=nptr;
+                    }
+                }
+            }
+        }
+        nptr=nptr->next;
+    }
+
+    if(samePincode!=NULL){
+        samePincode->professional=professional;
+        samePincode->Rstatus=ASSIGNED;
+        professional->Status=UNAVAILABLE;
+        printf("Pending request assigned successfully\n");
+    }
+    else if(diffPincode!=NULL){
+        diffPincode->professional=professional;
+        diffPincode->Rstatus=ASSIGNED;
+        professional->Status=UNAVAILABLE;
+        printf("Pending request assigned successfully\n");
+    }
+    else{
+        printf("No suitable pending request available\n");
+    }
+
+    return Rhead;
+}
+void FindProfessionalsByService(ProfessionalNode*Phead,ServiceNode*Shead){
+    int id;
+    ServiceNode*Snode=NULL;
+    ServiceNode*nptr=Shead;
+    ProfessionalNode*temp=Phead;
+
+    printf("List of Services\n");
+
+    while(nptr!=NULL){
+        printf("Service ID: %d  Name: %s\n",nptr->serviceId,nptr->serviceName);
+        nptr=nptr->next;
+    }
+
+    printf("Enter Service ID: ");
+    scanf("%d",&id);
+
+    Snode=FindService(Shead,id);
+
+    if(Snode==NULL){
+        printf("Service ID does not exist\n");
+    }
+    else{
+        printf("Professionals providing Service %d:\n",Snode->serviceId);
+
+        while(temp!=NULL){
+            if(ProfessionalProvideService(temp,Snode)==TRUE){
+                printf("Professional ID: %d\n",temp->professionalId);
+                printf("Professional Name: %s\n",temp->name);
+                printf("Pincode: %d\n",temp->pincode);
+                printf("Contact: %s\n",temp->contact);
+                printf("--------------------------------\n");
+            }
+            temp=temp->next;
+        }
+    }
+}
+void FindServicesByProfessional(ProfessionalNode*Phead){
+    int id;
+    ProfessionalNode*Pnode=NULL;
+    ProfessionalNode*nptr=Phead;
+
+    printf("List of Professionals\n");
+
+    while(nptr!=NULL){
+        printf("Professional ID: %d  Name: %s\n",nptr->professionalId,nptr->name);
+        nptr=nptr->next;
+    }
+
+    printf("Enter Professional ID: ");
+    scanf("%d",&id);
+
+    Pnode=FindProfessional(Phead,id);
+
+    if(Pnode==NULL){
+        printf("Professional ID does not exist\n");
+    }
+    else{
+        printf("Services provided by Professional %d:\n",Pnode->professionalId);
+
+        for(int i=0;i<Pnode->serviceCount;i++){
+            printf("Service ID: %d\n",Pnode->services[i]->serviceId);
+            printf("Service Name: %s\n",Pnode->services[i]->serviceName);
+            printf("Base Price: %.2f\n",Pnode->services[i]->basePrice);
+            printf("--------------------------------\n");
+        }
+    }
 }
