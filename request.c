@@ -198,3 +198,85 @@ RequestNode* CancelRequest(RequestNode*Rhead){
     }
     return Rhead;
 }
+void FindRequestsByCustomer(RequestNode*Rhead,CustomerNode*Chead){
+    int id;
+    CustomerNode*Cnode=NULL;
+    CustomerNode*nptr=Chead;
+    RequestNode*Rnode=Rhead;
+
+    printf("List of Customers\n");
+
+    while(nptr!=NULL){
+        printf("Customer ID: %d  Name: %s\n",nptr->customerId,nptr->name);
+        nptr=nptr->next;
+    }
+
+    printf("Enter Customer ID: ");
+    scanf("%d",&id);
+
+    Cnode=FindCustomer(Chead,id);
+
+    if(Cnode==NULL){
+        printf("Customer ID does not exist\n");
+    }
+    else{
+        printf("Requests of Customer %d - %s\n",Cnode->customerId,Cnode->name);
+
+        while(Rnode!=NULL){
+            if(Rnode->customer==Cnode){
+                printf("Request ID: %d\n",Rnode->requestId);
+                printf("Service: %s\n",Rnode->service->serviceName);
+                printf("Date: %s\n",Rnode->date);
+                printf("Time: %s\n",Rnode->time);
+                printf("--------------------------------\n");
+            }
+            Rnode=Rnode->next;
+        }
+    }
+}
+void DisplayPendingRequests(RequestNode*Rhead){
+    RequestNode*nptr=Rhead;
+    printf("Pending Requests\n");
+    while(nptr!=NULL){
+        if(nptr->Rstatus==PENDING){
+            printf("Request ID: %d\n",nptr->requestId);
+            printf("Customer: %s\n",nptr->customer->name);
+            printf("Service: %s\n",nptr->service->serviceName);
+            printf("Date: %s\n",nptr->date);
+            printf("Time: %s\n",nptr->time);
+            printf("--------------------------------\n");
+        }
+        nptr=nptr->next;
+    }
+}
+void DisplayServiceHistory(RequestNode*Rhead,ProfessionalNode*Phead){
+    int id;
+    ProfessionalNode*Pnode=NULL;
+    ProfessionalNode*nptr=Phead;
+    RequestNode*Rnode=Rhead;
+    printf("List of Professionals\n");
+    while(nptr!=NULL){
+        printf("Professional ID: %d  Name: %s\n",nptr->professionalId,nptr->name);
+        nptr=nptr->next;
+    }
+    printf("Enter Professional ID: ");
+    scanf("%d",&id);
+    Pnode=FindProfessional(Phead,id);
+    if(Pnode==NULL){
+        printf("Professional ID does not exist\n");
+    }
+    else{
+        printf("Service History of Professional %d:\n",Pnode->professionalId);
+        while(Rnode!=NULL){
+            if(Rnode->professional==Pnode && Rnode->Rstatus==COMPLETED){
+                printf("Request ID: %d\n",Rnode->requestId);
+                printf("Customer: %s\n",Rnode->customer->name);
+                printf("Service: %s\n",Rnode->service->serviceName);
+                printf("Date: %s\n",Rnode->date);
+                printf("Time: %s\n",Rnode->time);
+                printf("--------------------------------\n");
+            }
+            Rnode=Rnode->next;
+        }
+    }
+}

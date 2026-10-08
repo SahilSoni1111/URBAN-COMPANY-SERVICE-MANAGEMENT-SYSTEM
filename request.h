@@ -20,4 +20,8 @@ RequestNode* InsertRequest(RequestNode*,RequestNode*);
 RequestNode* FindRequest(RequestNode*,int);
 RequestNode* CreateServiceRequest(RequestNode*, ProfessionalNode*, ServiceNode*, CustomerNode*);
 RequestNode* CompleteRequest(RequestNode*, ProfessionalNode*);
+RequestNode* CancelRequest(RequestNode*);
+void FindRequestsByCustomer(RequestNode*Rhead,CustomerNode*Chead);
+void DisplayPendingRequests(RequestNode*Rhead);
+void DisplayServiceHistory(RequestNode*Rhead,ProfessionalNode*Phead);
 #endif
