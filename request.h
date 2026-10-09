@@ -15,12 +15,13 @@ typedef struct REQUEST_NODE{
     struct REQUEST_NODE*next;
 }RequestNode;
 
-RequestNode* CreateRequest(int,CustomerNode*,ServiceNode*,const char*,const char*);
+RequestNode* CreateRequest(int,CustomerNode*,ServiceNode*,ProfessionalNode*,const char*,const char*);
 RequestNode* InsertRequest(RequestNode*,RequestNode*);
 RequestNode* FindRequest(RequestNode*,int);
+RequestNode* AssignPendingRequest(RequestNode*,ProfessionalNode*);
 RequestNode* CreateServiceRequest(RequestNode*, ProfessionalNode*, ServiceNode*, CustomerNode*);
 RequestNode* CompleteRequest(RequestNode*, ProfessionalNode*);
-RequestNode* CancelRequest(RequestNode*);
+RequestNode* CancelRequest(RequestNode*,CustomerNode*);
 void FindRequestsByCustomer(RequestNode*Rhead,CustomerNode*Chead);
 void DisplayPendingRequests(RequestNode*Rhead);
 void DisplayServiceHistory(RequestNode*Rhead,ProfessionalNode*Phead);

@@ -3,20 +3,29 @@
 #include <string.h>
 #include "service.h"
 #include "common.h"
-ServiceNode* CreateService(int id, const char* name, float price){
+ServiceNode* CreateService(int id,const char*name,float price){
     ServiceNode*Snode=NULL;
+
     if(id<=0){
-        printf("Invalid Service ID");
+        printf("Invalid Service ID.\n");
+    }
+    else if(name==NULL || strlen(name)>=NAME_SIZE || price<=0){
+        printf("Invalid Service Name or Base Price.\n");
     }
     else{
         Snode=(ServiceNode*)malloc(sizeof(ServiceNode));
+
         if(Snode!=NULL){
             Snode->serviceId=id;
             Snode->basePrice=price;
-            strcpy(Snode->serviceName, name);
+            strcpy(Snode->serviceName,name);
             Snode->next=NULL;
         }
+        else{
+            printf("Service not created. Memory allocation failed.\n");
+        }
     }
+
     return Snode;
 }
 ServiceNode* InsertService(ServiceNode* head, ServiceNode* Snode){
@@ -87,28 +96,34 @@ ServiceNode* InputService(ServiceNode*head){
     int id;
     float price;
     char name[NAME_SIZE];
-    ServiceNode*Snode;
+    ServiceNode*Snode=NULL;
 
     printf("Enter Service ID: ");
     scanf("%d",&id);
-    
-    Snode=FindService(head,id);
 
-    if(Snode!=NULL){
+    if(id<=0){
+        printf("Invalid Service ID.\n");
+    }
+    else if(FindService(head,id)!=NULL){
         printf("Service ID already exists.\n");
     }
     else{
         printf("Enter Service Name: ");
-        scanf(" %[^\n]",name);
+        scanf(" %49[^\n]",name);
 
         printf("Enter Base Price: ");
         scanf("%f",&price);
 
-        Snode=CreateService(id,name,price);
+        if(price<=0){
+            printf("Invalid Base Price.\n");
+        }
+        else{
+            Snode=CreateService(id,name,price);
 
-        if(Snode!=NULL){
-            head=InsertService(head,Snode);
-            printf("Service added successfully.\n");
+            if(Snode!=NULL){
+                head=InsertService(head,Snode);
+                printf("Service added successfully.\n");
+            }
         }
     }
 

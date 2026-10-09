@@ -3,21 +3,31 @@
 #include <string.h>
 #include "customer.h"
 #include "common.h"
-CustomerNode* CreateCustomer(int id, const char* name, int pcode, const char* phone){
+CustomerNode* CreateCustomer(int id,const char*name,int pcode,const char*phone){
     CustomerNode*Cnode=NULL;
+
     if(id<=0){
-        printf("Invalid Customer ID\n");
+        printf("Invalid Customer ID.\n");
+    }
+    else if(name==NULL || phone==NULL ||
+            strlen(name)>=NAME_SIZE || strlen(phone)>=PHONE_SIZE){
+        printf("Invalid Customer Name or Contact Number.\n");
     }
     else{
         Cnode=(CustomerNode*)malloc(sizeof(CustomerNode));
+
         if(Cnode!=NULL){
             Cnode->customerId=id;
             Cnode->pincode=pcode;
-            strcpy(Cnode->name, name);
-            strcpy(Cnode->phone, phone);
+            strcpy(Cnode->name,name);
+            strcpy(Cnode->phone,phone);
             Cnode->next=NULL;
         }
+        else{
+            printf("Customer not created. Memory allocation failed.\n");
+        }
     }
+
     return Cnode;
 }
 CustomerNode* InsertCustomer(CustomerNode* head, CustomerNode*Cnode){
@@ -65,31 +75,36 @@ CustomerNode* FindCustomer(CustomerNode*head, int id){
 CustomerNode* RegisterCustomer(CustomerNode*head){
     int id,pcode;
     char name[NAME_SIZE],phone[PHONE_SIZE];
-    CustomerNode*Cnode;
+    CustomerNode*Cnode=NULL;
 
     printf("Enter Customer ID: ");
     scanf("%d",&id);
 
-    Cnode=FindCustomer(head,id);
-
-    if(Cnode!=NULL){
-        printf("Customer ID already exists.\n");
+    if(id<=0){
+        printf("Invalid Customer ID.\n");
     }
     else{
-        printf("Enter Customer Name: ");
-        scanf(" %[^\n]",name);
-
-        printf("Enter Pincode: ");
-        scanf("%d",&pcode);
-
-        printf("Enter Contact Number: ");
-        scanf("%s",phone);
-        
-        Cnode=CreateCustomer(id,name,pcode,phone);
+        Cnode=FindCustomer(head,id);
 
         if(Cnode!=NULL){
-            head=InsertCustomer(head,Cnode);
-            printf("Customer added successfully.\n");
+            printf("Customer ID already exists.\n");
+        }
+        else{
+            printf("Enter Customer Name: ");
+            scanf(" %49[^\n]",name);
+
+            printf("Enter Pincode: ");
+            scanf("%d",&pcode);
+
+            printf("Enter Contact Number: ");
+            scanf("%14s",phone);
+
+            Cnode=CreateCustomer(id,name,pcode,phone);
+
+            if(Cnode!=NULL){
+                head=InsertCustomer(head,Cnode);
+                printf("Customer added successfully.\n");
+            }
         }
     }
 

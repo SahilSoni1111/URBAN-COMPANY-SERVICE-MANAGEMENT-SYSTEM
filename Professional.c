@@ -8,10 +8,11 @@
 ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact){
     ProfessionalNode*Pnode=NULL;
     if(id<=0){
-        printf("Invalid Professional ID");
+        printf("Invalid Professional ID\n");
     }
     else{
         Pnode=(ProfessionalNode*)malloc(sizeof(ProfessionalNode));
+
         if(Pnode!=NULL){
             Pnode->professionalId=id;
             Pnode->pincode=pcode;
@@ -19,12 +20,18 @@ ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const cha
             strcpy(Pnode->contact,contact);
             Pnode->Status=AVAILABLE;
             Pnode->serviceCount=0;
+
             for(int i=0;i<MAX_SERVICES;i++){
                 Pnode->services[i]=NULL;
             }
+
             Pnode->next=NULL;
         }
+        else{
+            printf("Professional not assigned. Memory allocation failed.\n");
+        }
     }
+
     return Pnode;
 }
 ProfessionalNode* InsertProfessional(ProfessionalNode*head,ProfessionalNode*Pnode){
@@ -72,74 +79,92 @@ ProfessionalNode* FindProfessional(ProfessionalNode*head,int id){
 }
 Bool AddServicetoProfessional(ProfessionalNode*Pnode,ServiceNode*Snode){
     Bool added=FALSE;
+
     if(Pnode!=NULL && Snode!=NULL){
-        if(Pnode->serviceCount<MAX_SERVICES){
+        if(ProfessionalProvideService(Pnode,Snode)==FALSE &&
+           Pnode->serviceCount<MAX_SERVICES){
             Pnode->services[Pnode->serviceCount]=Snode;
             Pnode->serviceCount++;
             added=TRUE;
         }
     }
+
     return added;
 }
 ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*serviceHead){
     int id,pcode,serviceId,numberOfServices;
     char name[NAME_SIZE],contact[PHONE_SIZE];
-    ProfessionalNode*Pnode;
-    ServiceNode*Snode;
-    
+    ProfessionalNode*Pnode=NULL;
+    ServiceNode*Snode=NULL;
+    Bool valid=TRUE;
+
     printf("Enter Professional ID: ");
     scanf("%d",&id);
-    Pnode=FindProfessional(head,id);
 
-    if(Pnode!=NULL){
+    if(id<=0){
+        printf("Invalid Professional ID.\n");
+    }
+    else if(FindProfessional(head,id)!=NULL){
         printf("Professional ID already exists.\n");
+    }
+    else if(serviceHead==NULL){
+        printf("No services available. Add services first.\n");
     }
     else{
         printf("Enter Professional Name: ");
-        scanf("%[^\n]",name);
+        scanf(" %49[^\n]",name);
 
         printf("Enter Pincode: ");
         scanf("%d",&pcode);
 
         printf("Enter Contact Number: ");
-        scanf("%s",contact);
+        scanf("%14s",contact);
 
         Pnode=CreateProfessional(id,name,pcode,contact);
 
         if(Pnode!=NULL){
             DisplayService(serviceHead);
-            printf("Enter number of services: ");
+
+            printf("Enter number of services: (max limit 5) ");
             scanf("%d",&numberOfServices);
 
             if(numberOfServices<1 || numberOfServices>MAX_SERVICES){
                 printf("Invalid number of services.\n");
                 free(Pnode);
+                Pnode=NULL;
             }
             else{
                 for(int i=0;i<numberOfServices;i++){
                     printf("Enter Service ID: ");
                     scanf("%d",&serviceId);
+
                     Snode=FindService(serviceHead,serviceId);
 
                     if(Snode==NULL){
                         printf("Invalid Service ID. Enter again.\n");
                         i--;
                     }
+                    else if(ProfessionalProvideService(Pnode,Snode)==TRUE){
+                        printf("Service already selected. Enter another Service ID.\n");
+                        i--;
+                    }
+                    else if(AddServicetoProfessional(Pnode,Snode)==FALSE){
+                        printf("Service could not be added. Enter again.\n");
+                        i--;
+                    }
                     else{
-                        if(AddServicetoProfessional(Pnode,Snode)==TRUE){
-                            printf("Service added successfully.\n");
-                        }
-                        else{
-                            printf("Not Inserted. Enter Again\n");
-                            i--;
-                        }
+                        printf("Service added successfully.\n");
                     }
                 }
-                head=InsertProfessional(head,Pnode);
-                printf("Professional added successfully.\n");
+
+                if(Pnode!=NULL){
+                    head=InsertProfessional(head,Pnode);
+                    printf("Professional added successfully.\n");
+                }
             }
         }
     }
+
     return head;
 }
 Bool ProfessionalProvideService(ProfessionalNode*pnode, ServiceNode*Snode){
@@ -153,68 +178,38 @@ Bool ProfessionalProvideService(ProfessionalNode*pnode, ServiceNode*Snode){
     }
     return found;
 }
-ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*service, ProfessionalNode*head){
+ProfessionalNode* FindcorrectProfessional(CustomerNode*customer,ServiceNode*service,ProfessionalNode*head){
     ProfessionalNode*temp=head;
     ProfessionalNode*samepincode=NULL;
     ProfessionalNode*diffpincode=NULL;
-    while(temp!=NULL){
-        if(temp->Status==AVAILABLE && ProfessionalProvideService(temp, service)==TRUE){
-            if(temp->pincode==customer->pincode){
-                if(samepincode==NULL)
-                samepincode=temp;
-            }
-            else{
-                if(diffpincode==NULL)
-                diffpincode=temp;
-            }
-        }
-        temp=temp->next;
-    }
     ProfessionalNode*retval=NULL;
-    if(samepincode!=NULL) retval=samepincode;
-    else retval=diffpincode;
-    return retval;
-}
-RequestNode* AssignPendingRequest(RequestNode*Rhead,ProfessionalNode*professional){
-    RequestNode*nptr=Rhead;
-    RequestNode*samePincode=NULL;
-    RequestNode*diffPincode=NULL;
 
-    while(nptr!=NULL){
-        if(nptr->Rstatus==PENDING){
-            if(ProfessionalProvideService(professional,nptr->service)==TRUE){
-                if(nptr->customer->pincode==professional->pincode){
-                    if(samePincode==NULL){
-                        samePincode=nptr;
+    if(customer!=NULL && service!=NULL){
+        while(temp!=NULL){
+            if(temp->Status==AVAILABLE &&
+               ProfessionalProvideService(temp,service)==TRUE){
+                if(temp->pincode==customer->pincode){
+                    if(samepincode==NULL){
+                        samepincode=temp;
                     }
                 }
                 else{
-                    if(diffPincode==NULL){
-                        diffPincode=nptr;
+                    if(diffpincode==NULL){
+                        diffpincode=temp;
                     }
                 }
             }
+            temp=temp->next;
         }
-        nptr=nptr->next;
+        if(samepincode!=NULL){
+            retval=samepincode;
+        }
+        else{
+            retval=diffpincode;
+        }
     }
 
-    if(samePincode!=NULL){
-        samePincode->professional=professional;
-        samePincode->Rstatus=ASSIGNED;
-        professional->Status=UNAVAILABLE;
-        printf("Pending request assigned successfully\n");
-    }
-    else if(diffPincode!=NULL){
-        diffPincode->professional=professional;
-        diffPincode->Rstatus=ASSIGNED;
-        professional->Status=UNAVAILABLE;
-        printf("Pending request assigned successfully\n");
-    }
-    else{
-        printf("No suitable pending request available\n");
-    }
-
-    return Rhead;
+    return retval;
 }
 void FindProfessionalsByService(ProfessionalNode*Phead,ServiceNode*Shead){
     int id;

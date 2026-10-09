@@ -22,7 +22,6 @@ Bool AddServicetoProfessional(ProfessionalNode*Pnode, ServiceNode*Snode);
 ProfessionalNode* RegisterProfessional(ProfessionalNode*head, ServiceNode*serviceHead);
 Bool ProfessionalProvideService(ProfessionalNode*pnode, ServiceNode*Snode);
 ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*service, ProfessionalNode*head);
-RequestNode*AssignPendingRequest(RequestNode*Rhead,ProfessionalNode*professional);
 void FindProfessionalsByService(ProfessionalNode*Phead,ServiceNode*Shead);
 void FindServicesByProfessional(ProfessionalNode*Phead);
 #endif
