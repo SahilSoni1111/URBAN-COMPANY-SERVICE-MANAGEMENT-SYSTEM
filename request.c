@@ -6,7 +6,11 @@
 RequestNode* CreateRequest(int id,CustomerNode*customer,ServiceNode*service,ProfessionalNode*professional,const char*date,const char*time){
     RequestNode*Rnode=NULL;
     if(id<=0){
-        printf("Invalid Request ID\n");
+        printf("Invalid Request ID.\n");
+    }
+    else if(customer==NULL || service==NULL || date==NULL || time==NULL ||
+            strlen(date)>=DATE_SIZE || strlen(time)>=TIME_SIZE){
+        printf("Invalid Request details.\n");
     }
     else{
         Rnode=(RequestNode*)malloc(sizeof(RequestNode));
@@ -31,28 +35,32 @@ RequestNode* CreateRequest(int id,CustomerNode*customer,ServiceNode*service,Prof
 }
 RequestNode* InsertRequest(RequestNode*head,RequestNode*Rnode){
     RequestNode*temp=head;
-    int dublicate=0;
-    if(head==NULL){
-        head=Rnode;
-    }
-    else{
-        RequestNode*prev=NULL;
-        while(temp!=NULL && !dublicate){
-            if(temp->requestId==Rnode->requestId){
-                dublicate=1;
-            }
-            prev=temp;
-            temp=temp->next;
-        }
-        if(dublicate==1){
-            printf("Request ID already exists.\n");
-            free(Rnode);
+
+    if(Rnode!=NULL){
+        if(head==NULL){
+            head=Rnode;
         }
         else{
-            prev->next=Rnode;
-            Rnode->next=temp;
+            int duplicate=0;
+            RequestNode*prev=NULL;
+            while(temp!=NULL && !duplicate){
+                if(temp->requestId==Rnode->requestId){
+                    duplicate=1;
+                }
+                prev=temp;
+                temp=temp->next;
+            }
+            if(duplicate==1){
+                printf("Request ID already exists.\n");
+                free(Rnode);
+            }
+            else{
+                prev->next=Rnode;
+                Rnode->next=temp;
+            }
         }
     }
+
     return head;
 }
 RequestNode* FindRequest(RequestNode*head,int id){
@@ -226,7 +234,8 @@ RequestNode* CompleteRequest(RequestNode*Rhead,ProfessionalNode*Phead){
         scanf("%d",&serviceId);
 
         for(int i=0;i<Pnode->serviceCount;i++){
-            if(Pnode->services[i]->serviceId==serviceId){
+            if(Pnode->services[i]!=NULL &&
+                Pnode->services[i]->serviceId==serviceId){
                 Snode=Pnode->services[i];
                 found=1;
             }
@@ -281,12 +290,11 @@ RequestNode* CompleteRequest(RequestNode*Rhead,ProfessionalNode*Phead){
 
     return Rhead;
 }
-RequestNode* CancelRequest(RequestNode*Rhead,CustomerNode*Chead){
+RequestNode* CancelRequest(RequestNode*Rhead,ProfessionalNode*Phead,CustomerNode*Chead){
     int id;
     int customerId;
     int count=0;
     RequestNode*Rnode=NULL;
-    RequestNode*nptr=Rhead;
     RequestNode*temp=Rhead;
     CustomerNode*Cnode=NULL;
     CustomerNode*Ctemp=Chead;
@@ -305,21 +313,24 @@ RequestNode* CancelRequest(RequestNode*Rhead,CustomerNode*Chead){
     Cnode=FindCustomer(Chead,customerId);
 
     if(Cnode==NULL){
-        printf("Customer ID does not exist\n");
+        printf("Customer ID does not exist.\n");
     }
     else{
         printf("Requests of Customer %d\n",Cnode->customerId);
 
         while(temp!=NULL){
-            if(temp->customer==Cnode && temp->Rstatus!=CANCELLED && temp->Rstatus!=COMPLETED){
+            if(temp->customer==Cnode &&
+               temp->Rstatus!=CANCELLED &&
+               temp->Rstatus!=COMPLETED){
                 count++;
-                printf("(%d) Request ID: %d  Service: %s\n",count,temp->requestId,temp->service->serviceName);
+                printf("(%d) Request ID: %d  Service: %s\n",
+                       count,temp->requestId,temp->service->serviceName);
             }
             temp=temp->next;
         }
 
         if(count==0){
-            printf("No requests available for cancellation\n");
+            printf("No requests available for cancellation.\n");
         }
         else{
             printf("Enter the Request ID which you want to Cancel: ");
@@ -328,27 +339,27 @@ RequestNode* CancelRequest(RequestNode*Rhead,CustomerNode*Chead){
             Rnode=FindRequest(Rhead,id);
 
             if(Rnode==NULL || Rnode->customer!=Cnode){
-                printf("Invalid Request ID for this customer\n");
+                printf("Invalid Request ID for this customer.\n");
+            }
+            else if(Rnode->Rstatus==COMPLETED){
+                printf("Completed request cannot be cancelled.\n");
+            }
+            else if(Rnode->Rstatus==CANCELLED){
+                printf("Request is already cancelled.\n");
             }
             else{
-                if(Rnode->Rstatus==COMPLETED){
-                    printf("Completed request cannot be cancelled\n");
+                if(Rnode->Rstatus==ASSIGNED){
+                    professional=Rnode->professional;
                 }
-                else if(Rnode->Rstatus==CANCELLED){
-                    printf("Request is already cancelled\n");
-                }
-                else{
-                    if(Rnode->Rstatus==ASSIGNED){
-                        professional=Rnode->professional;
-                        professional->Status=AVAILABLE;
-                    }
 
-                    Rnode->Rstatus=CANCELLED;
-                    printf("Request cancelled successfully\n");
+                Rnode->Rstatus=CANCELLED;
+                Rnode->professional=NULL;
 
-                    if(professional!=NULL){
-                        Rhead=AssignPendingRequest(Rhead,professional);
-                    }
+                printf("Request cancelled successfully.\n");
+
+                if(professional!=NULL){
+                    professional->Status=AVAILABLE;
+                    Rhead=AssignPendingRequest(Rhead,professional);
                 }
             }
         }
@@ -358,6 +369,7 @@ RequestNode* CancelRequest(RequestNode*Rhead,CustomerNode*Chead){
 }
 void FindRequestsByCustomer(RequestNode*Rhead,CustomerNode*Chead){
     int id;
+    int count=0;
     CustomerNode*Cnode=NULL;
     CustomerNode*nptr=Chead;
     RequestNode*Rnode=Rhead;
@@ -382,21 +394,47 @@ void FindRequestsByCustomer(RequestNode*Rhead,CustomerNode*Chead){
 
         while(Rnode!=NULL){
             if(Rnode->customer==Cnode){
+                count++;
                 printf("Request ID: %d\n",Rnode->requestId);
                 printf("Service: %s\n",Rnode->service->serviceName);
                 printf("Date: %s\n",Rnode->date);
                 printf("Time: %s\n",Rnode->time);
+                if(Rnode->Rstatus==PENDING){
+                    printf("Status: Pending\n");
+                }
+                else if(Rnode->Rstatus==ASSIGNED){
+                    printf("Status: Assigned\n");
+                    if(Rnode->professional!=NULL){
+                        printf("Professional: %s (Contact: %s)\n",
+                               Rnode->professional->name,Rnode->professional->contact);
+                    }
+                }
+                else if(Rnode->Rstatus==COMPLETED){
+                    printf("Status: Completed\n");
+                    if(Rnode->professional!=NULL){
+                        printf("Completed by: %s\n",Rnode->professional->name);
+                    }
+                }
+                else if(Rnode->Rstatus==CANCELLED){
+                    printf("Status: Cancelled\n");
+                }
                 printf("--------------------------------\n");
             }
             Rnode=Rnode->next;
+        }
+
+        if(count==0){
+            printf("No requests found for this customer.\n");
         }
     }
 }
 void DisplayPendingRequests(RequestNode*Rhead){
     RequestNode*nptr=Rhead;
+    int count=0;
     printf("Pending Requests\n");
     while(nptr!=NULL){
         if(nptr->Rstatus==PENDING){
+            count++;
             printf("Request ID: %d\n",nptr->requestId);
             printf("Customer: %s\n",nptr->customer->name);
             printf("Service: %s\n",nptr->service->serviceName);
@@ -406,9 +444,14 @@ void DisplayPendingRequests(RequestNode*Rhead){
         }
         nptr=nptr->next;
     }
+    if(count==0){
+        printf("No pending requests found.\n");
+    }
 }
 void DisplayServiceHistory(RequestNode*Rhead,ProfessionalNode*Phead){
+
     int id;
+    int count=0;
     ProfessionalNode*Pnode=NULL;
     ProfessionalNode*nptr=Phead;
     RequestNode*Rnode=Rhead;
@@ -427,6 +470,7 @@ void DisplayServiceHistory(RequestNode*Rhead,ProfessionalNode*Phead){
         printf("Service History of Professional %d:\n",Pnode->professionalId);
         while(Rnode!=NULL){
             if(Rnode->professional==Pnode && Rnode->Rstatus==COMPLETED){
+                count++;
                 printf("Request ID: %d\n",Rnode->requestId);
                 printf("Customer: %s\n",Rnode->customer->name);
                 printf("Service: %s\n",Rnode->service->serviceName);
@@ -435,6 +479,218 @@ void DisplayServiceHistory(RequestNode*Rhead,ProfessionalNode*Phead){
                 printf("--------------------------------\n");
             }
             Rnode=Rnode->next;
+        }
+        if(count==0){
+            printf("No completed service history found.\n");
+        }
+    }
+}
+void MergeServiceCount(ServiceCount arr[],int low,int mid,int high){
+    ServiceCount temp[MAX_REPORT_ITEMS];
+    int i=low;
+    int j=mid+1;
+    int k=low;
+
+    while(i<=mid && j<=high){
+        if(arr[i].count>arr[j].count ||
+           (arr[i].count==arr[j].count &&
+            arr[i].service->serviceId<arr[j].service->serviceId)){
+            temp[k]=arr[i];
+            i++;
+        }
+        else{
+            temp[k]=arr[j];
+            j++;
+        }
+        k++;
+    }
+
+    while(i<=mid){
+        temp[k]=arr[i];
+        i++;
+        k++;
+    }
+
+    while(j<=high){
+        temp[k]=arr[j];
+        j++;
+        k++;
+    }
+
+    i=low;
+
+    while(i<=high){
+        arr[i]=temp[i];
+        i++;
+    }
+}
+void MergeSortServiceCount(ServiceCount arr[],int low,int high){
+    int mid=0;
+
+    if(low<high){
+        mid=low+(high-low)/2;
+
+        MergeSortServiceCount(arr,low,mid);
+        MergeSortServiceCount(arr,mid+1,high);
+
+        MergeServiceCount(arr,low,mid,high);
+    }
+}
+void ServiceDemandReport(ServiceNode *Shead,RequestNode *Rhead){
+    ServiceNode *Snode=Shead;
+    RequestNode *Rnode=Rhead;
+    ServiceCount arr[MAX_REPORT_ITEMS];
+    int total=0;
+    int i=0;
+
+    while(Snode!=NULL && total<MAX_REPORT_ITEMS){
+        arr[total].service=Snode;
+        arr[total].count=0;
+        total++;
+        Snode=Snode->next;
+    }
+
+    if(Snode!=NULL){
+        printf("Maximum report capacity exceeded.\n");
+    }
+    else if(total==0){
+        printf("No services available.\n");
+    }
+    else{
+        while(Rnode!=NULL){
+            i=0;
+
+            while(i<total){
+                if(Rnode->service==arr[i].service){
+                    arr[i].count++;
+                }
+                i++;
+            }
+
+            Rnode=Rnode->next;
+        }
+
+        MergeSortServiceCount(arr,0,total-1);
+
+        printf("\nSERVICE DEMAND REPORT\n");
+        printf("---------------------------------------------\n");
+        printf("%-12s %-25s %s\n",
+               "Service ID","Service Name","Requests");
+
+        i=0;
+
+        while(i<total){
+            printf("%-12d %-25s %d\n",
+                   arr[i].service->serviceId,
+                   arr[i].service->serviceName,
+                   arr[i].count);
+            i++;
+        }
+    }
+}
+void MergeProfessionalCount(ProfessionalCount arr[],int low,int mid,int high){
+    ProfessionalCount temp[MAX_REPORT_ITEMS];
+    int i=low;
+    int j=mid+1;
+    int k=low;
+
+    while(i<=mid && j<=high){
+        if(arr[i].count>arr[j].count ||
+           (arr[i].count==arr[j].count &&
+            arr[i].professional->professionalId<
+            arr[j].professional->professionalId)){
+            temp[k]=arr[i];
+            i++;
+        }
+        else{
+            temp[k]=arr[j];
+            j++;
+        }
+        k++;
+    }
+
+    while(i<=mid){
+        temp[k]=arr[i];
+        i++;
+        k++;
+    }
+
+    while(j<=high){
+        temp[k]=arr[j];
+        j++;
+        k++;
+    }
+
+    i=low;
+
+    while(i<=high){
+        arr[i]=temp[i];
+        i++;
+    }
+}
+void MergeSortProfessionalCount(ProfessionalCount arr[],int low,int high){
+    int mid=0;
+
+    if(low<high){
+        mid=low+(high-low)/2;
+
+        MergeSortProfessionalCount(arr,low,mid);
+        MergeSortProfessionalCount(arr,mid+1,high);
+
+        MergeProfessionalCount(arr,low,mid,high);
+    }
+}
+void ProfessionalActivityReport(ProfessionalNode *Phead,RequestNode *Rhead){
+    ProfessionalNode *Pnode=Phead;
+    RequestNode *Rnode=Rhead;
+    ProfessionalCount arr[MAX_REPORT_ITEMS];
+    int total=0;
+    int i=0;
+
+    while(Pnode!=NULL && total<MAX_REPORT_ITEMS){
+        arr[total].professional=Pnode;
+        arr[total].count=0;
+        total++;
+        Pnode=Pnode->next;
+    }
+
+    if(Pnode!=NULL){
+        printf("Maximum report capacity exceeded.\n");
+    }
+    else if(total==0){
+        printf("No professionals available.\n");
+    }
+    else{
+        while(Rnode!=NULL){
+            if(Rnode->Rstatus==COMPLETED && Rnode->professional!=NULL){
+                i=0;
+
+                while(i<total){
+                    if(Rnode->professional==arr[i].professional){
+                        arr[i].count++;
+                    }
+                    i++;
+                }
+            }
+
+            Rnode=Rnode->next;
+        }
+
+        MergeSortProfessionalCount(arr,0,total-1);
+
+        printf("\nPROFESSIONAL ACTIVITY REPORT\n");
+        printf("--------------------------------------------------\n");
+        printf("%-16s %-25s %s\n",
+               "Professional ID","Professional Name","Completed");
+
+        i=0;
+
+        while(i<total){
+            printf("%-16d %-25s %d\n",
+                   arr[i].professional->professionalId,
+                   arr[i].professional->name,
+                   arr[i].count);
+            i++;
         }
     }
 }

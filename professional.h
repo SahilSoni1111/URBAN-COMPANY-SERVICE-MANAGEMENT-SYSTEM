@@ -24,4 +24,5 @@ Bool ProfessionalProvideService(ProfessionalNode*pnode, ServiceNode*Snode);
 ProfessionalNode* FindcorrectProfessional(CustomerNode*customer, ServiceNode*service, ProfessionalNode*head);
 void FindProfessionalsByService(ProfessionalNode*Phead,ServiceNode*Shead);
 void FindServicesByProfessional(ProfessionalNode*Phead);
+void DisplayProfessionals(ProfessionalNode*);
 #endif

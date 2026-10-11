@@ -8,7 +8,11 @@
 ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const char* contact){
     ProfessionalNode*Pnode=NULL;
     if(id<=0){
-        printf("Invalid Professional ID\n");
+        printf("Invalid Professional ID.\n");
+    }
+    else if(name==NULL || contact==NULL ||
+            strlen(name)>=NAME_SIZE || strlen(contact)>=PHONE_SIZE){
+        printf("Invalid Professional Name or Contact Number.\n");
     }
     else{
         Pnode=(ProfessionalNode*)malloc(sizeof(ProfessionalNode));
@@ -36,33 +40,36 @@ ProfessionalNode* CreateProfessional(int id,const char* name,int pcode,const cha
 }
 ProfessionalNode* InsertProfessional(ProfessionalNode*head,ProfessionalNode*Pnode){
     ProfessionalNode*temp=head;
-    int dublicate=0;
 
-    if(head==NULL){
-        head=Pnode;
-    }
-    else if(head->professionalId>Pnode->professionalId){
-        Pnode->next=head;
-        head=Pnode;
-    }
-    else{
-        ProfessionalNode*prev=NULL;
-        while(temp!=NULL && temp->professionalId<Pnode->professionalId){
-            prev=temp;
-            temp=temp->next;
+    if(Pnode!=NULL){
+        if(head==NULL){
+            head=Pnode;
         }
-        if(temp!=NULL && temp->professionalId==Pnode->professionalId){
-            dublicate=1;
+        else if(head->professionalId>Pnode->professionalId){
+            Pnode->next=head;
+            head=Pnode;
         }
         else{
-            prev->next=Pnode;
-            Pnode->next=temp;
-        }
-        if(dublicate==1){
-            printf("Professional ID already exists.\n");
-            free(Pnode);
+            int duplicate=0;
+            ProfessionalNode*prev=NULL;
+            while(temp!=NULL && temp->professionalId<Pnode->professionalId){
+                prev=temp;
+                temp=temp->next;
+            }
+            if(temp!=NULL && temp->professionalId==Pnode->professionalId){
+                duplicate=1;
+            }
+            else{
+                prev->next=Pnode;
+                Pnode->next=temp;
+            }
+            if(duplicate==1){
+                printf("Professional ID already exists.\n");
+                free(Pnode);
+            }
         }
     }
+
     return head;
 }
 ProfessionalNode* FindProfessional(ProfessionalNode*head,int id){
@@ -96,7 +103,6 @@ ProfessionalNode* RegisterProfessional(ProfessionalNode*head,ServiceNode*service
     char name[NAME_SIZE],contact[PHONE_SIZE];
     ProfessionalNode*Pnode=NULL;
     ServiceNode*Snode=NULL;
-    Bool valid=TRUE;
 
     printf("Enter Professional ID: ");
     scanf("%d",&id);
@@ -233,10 +239,12 @@ void FindProfessionalsByService(ProfessionalNode*Phead,ServiceNode*Shead){
         printf("Service ID does not exist\n");
     }
     else{
+        int count=0;
         printf("Professionals providing Service %d:\n",Snode->serviceId);
 
         while(temp!=NULL){
             if(ProfessionalProvideService(temp,Snode)==TRUE){
+                count++;
                 printf("Professional ID: %d\n",temp->professionalId);
                 printf("Professional Name: %s\n",temp->name);
                 printf("Pincode: %d\n",temp->pincode);
@@ -244,6 +252,10 @@ void FindProfessionalsByService(ProfessionalNode*Phead,ServiceNode*Shead){
                 printf("--------------------------------\n");
             }
             temp=temp->next;
+        }
+
+        if(count==0){
+            printf("No professionals provide this service.\n");
         }
     }
 }
@@ -270,11 +282,55 @@ void FindServicesByProfessional(ProfessionalNode*Phead){
     else{
         printf("Services provided by Professional %d:\n",Pnode->professionalId);
 
-        for(int i=0;i<Pnode->serviceCount;i++){
-            printf("Service ID: %d\n",Pnode->services[i]->serviceId);
-            printf("Service Name: %s\n",Pnode->services[i]->serviceName);
-            printf("Base Price: %.2f\n",Pnode->services[i]->basePrice);
-            printf("--------------------------------\n");
+        if(Pnode->serviceCount==0){
+            printf("No services offered by this professional.\n");
+        }
+        else{
+            for(int i=0;i<Pnode->serviceCount;i++){
+                printf("Service ID: %d\n",Pnode->services[i]->serviceId);
+                printf("Service Name: %s\n",Pnode->services[i]->serviceName);
+                printf("Base Price: %.2f\n",Pnode->services[i]->basePrice);
+                printf("--------------------------------\n");
+            }
+        }
+    }
+}
+void DisplayProfessionals(ProfessionalNode *Phead){
+    ProfessionalNode *Pnode=Phead;
+    int i=0;
+
+    if(Pnode==NULL){
+        printf("No professionals available.\n");
+    }
+    else{
+        printf("\nREGISTERED PROFESSIONALS\n");
+
+        while(Pnode!=NULL){
+            printf("\nProfessional ID: %d\n",Pnode->professionalId);
+            printf("Name: %s\n",Pnode->name);
+            printf("Pincode: %d\n",Pnode->pincode);
+            printf("Contact: %s\n",Pnode->contact);
+
+            if(Pnode->Status==AVAILABLE){
+                printf("Status: Available\n");
+            }
+            else{
+                printf("Status: Unavailable\n");
+            }
+
+            printf("Services Offered:\n");
+
+            i=0;
+            while(i<Pnode->serviceCount){
+                if(Pnode->services[i]!=NULL){
+                    printf("Service ID: %d  Service Name: %s\n",
+                           Pnode->services[i]->serviceId,
+                           Pnode->services[i]->serviceName);
+                }
+                i++;
+            }
+
+            Pnode=Pnode->next;
         }
     }
 }

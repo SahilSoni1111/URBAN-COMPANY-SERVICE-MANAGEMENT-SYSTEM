@@ -30,32 +30,36 @@ ServiceNode* CreateService(int id,const char*name,float price){
 }
 ServiceNode* InsertService(ServiceNode* head, ServiceNode* Snode){
     ServiceNode*temp=head;
-    if(head==NULL){
-        head=Snode;
-    }
-    else if(head->serviceId>Snode->serviceId){
-        Snode->next=head;
-        head=Snode;
-    }
-    else{
-        int dublicate=0;
-        ServiceNode*prev=NULL;
-        while(temp!=NULL && temp->serviceId<Snode->serviceId){
-            prev=temp;
-            temp=temp->next;
+
+    if(Snode!=NULL){
+        if(head==NULL){
+            head=Snode;
         }
-        if(temp!=NULL && temp->serviceId==Snode->serviceId){
-            dublicate=1;
+        else if(head->serviceId>Snode->serviceId){
+            Snode->next=head;
+            head=Snode;
         }
         else{
-            prev->next=Snode;
-            Snode->next=temp;
-        }
-        if(dublicate==1){
-            printf("Service ID already exists.\n");
-            free(Snode);
+            int duplicate=0;
+            ServiceNode*prev=NULL;
+            while(temp!=NULL && temp->serviceId<Snode->serviceId){
+                prev=temp;
+                temp=temp->next;
+            }
+            if(temp!=NULL && temp->serviceId==Snode->serviceId){
+                duplicate=1;
+            }
+            else{
+                prev->next=Snode;
+                Snode->next=temp;
+            }
+            if(duplicate==1){
+                printf("Service ID already exists.\n");
+                free(Snode);
+            }
         }
     }
+
     return head;
 }
 ServiceNode* FindService(ServiceNode*head,int id){
@@ -86,7 +90,7 @@ void DisplayService(ServiceNode*head){
         while(temp!=NULL){
             printf("Service ID: %d\n",temp->serviceId);
             printf("Service Name: %s\n",temp->serviceName);
-            printf("Base Price: %f\n",temp->basePrice);
+            printf("Base Price: %.2f\n",temp->basePrice);
             printf("--------------------------------------\n");
             temp=temp->next;
         }

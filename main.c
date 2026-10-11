@@ -1,14 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "common.h"
 #include "customer.h"
 #include "service.h"
 #include "professional.h"
 #include "request.h"
-void FreeAllLists(CustomerNode*Chead,ServiceNode*Shead,ProfessionalNode*Phead,RequestNode*Rhead){
-    CustomerNode*Ctemp=NULL;
-    ServiceNode*Stemp=NULL;
-    ProfessionalNode*Ptemp=NULL;
-    RequestNode*Rtemp=NULL;
+
+void FreeAllLists(CustomerNode *Chead, ServiceNode *Shead,
+                  ProfessionalNode *Phead, RequestNode *Rhead){
+    RequestNode *Rtemp=NULL;
+    CustomerNode *Ctemp=NULL;
+    ServiceNode *Stemp=NULL;
+    ProfessionalNode *Ptemp=NULL;
 
     while(Rhead!=NULL){
         Rtemp=Rhead;
@@ -34,283 +37,245 @@ void FreeAllLists(CustomerNode*Chead,ServiceNode*Shead,ProfessionalNode*Phead,Re
         free(Ptemp);
     }
 
-    printf("All linked lists freed successfully.\n");
-    printf("----------------------------------------\n");
+    printf("All lists freed successfully.\n");
 }
-void LoadTestData(CustomerNode**Chead,ServiceNode**Shead,ProfessionalNode**Phead){
-    CustomerNode*Cnode=NULL;
-    ServiceNode*Snode=NULL;
-    ProfessionalNode*Pnode=NULL;
 
-    Snode=CreateService(101,"Home Cleaning",800);
+void LoadTestData(CustomerNode **Chead, ServiceNode **Shead,
+                  ProfessionalNode **Phead){
+    ServiceNode *Snode=NULL;
+    CustomerNode *Cnode=NULL;
+    ProfessionalNode *Pnode=NULL;
+
+    Snode=CreateService(101,"Plumbing",500.0);
     *Shead=InsertService(*Shead,Snode);
 
-    Snode=CreateService(102,"Plumbing",500);
+    Snode=CreateService(102,"Electrical Repair",400.0);
     *Shead=InsertService(*Shead,Snode);
 
-    Snode=CreateService(103,"Electrical Repair",600);
+    Snode=CreateService(103,"Cleaning",300.0);
     *Shead=InsertService(*Shead,Snode);
 
-    Snode=CreateService(104,"AC Servicing",1200);
+    Snode=CreateService(104,"Painting",1000.0);
     *Shead=InsertService(*Shead,Snode);
 
-    Snode=CreateService(105,"Appliance Repair",900);
+    Snode=CreateService(105,"Carpentry",600.0);
     *Shead=InsertService(*Shead,Snode);
 
-
-    Cnode=CreateCustomer(301,"Karan Mehta",440001,"9876500001");
+    Cnode=CreateCustomer(301,"Rahul",440001,"9876543210");
     *Chead=InsertCustomer(*Chead,Cnode);
 
-    Cnode=CreateCustomer(302,"Neha Joshi",440002,"9876500002");
+    Cnode=CreateCustomer(302,"Amit",440002,"9876543211");
     *Chead=InsertCustomer(*Chead,Cnode);
 
-    Cnode=CreateCustomer(303,"Rohan Gupta",440003,"9876500003");
+    Cnode=CreateCustomer(303,"Priya",440001,"9876543212");
     *Chead=InsertCustomer(*Chead,Cnode);
 
+    Pnode=CreateProfessional(201,"Ramesh",440001,"9876500001");
+    if(Pnode!=NULL){
+        AddServicetoProfessional(Pnode,FindService(*Shead,101));
+        AddServicetoProfessional(Pnode,FindService(*Shead,102));
+        *Phead=InsertProfessional(*Phead,Pnode);
+    }
 
-    Pnode=CreateProfessional(201,"Rahul Sharma",440001,"9876543210");
-    AddServicetoProfessional(Pnode,FindService(*Shead,101));
-    AddServicetoProfessional(Pnode,FindService(*Shead,102));
-    AddServicetoProfessional(Pnode,FindService(*Shead,103));
-    *Phead=InsertProfessional(*Phead,Pnode);
+    Pnode=CreateProfessional(202,"Suresh",440002,"9876500002");
+    if(Pnode!=NULL){
+        AddServicetoProfessional(Pnode,FindService(*Shead,103));
+        AddServicetoProfessional(Pnode,FindService(*Shead,104));
+        *Phead=InsertProfessional(*Phead,Pnode);
+    }
 
-    Pnode=CreateProfessional(202,"Amit Verma",440002,"9876543211");
-    AddServicetoProfessional(Pnode,FindService(*Shead,102));
-    AddServicetoProfessional(Pnode,FindService(*Shead,104));
-    AddServicetoProfessional(Pnode,FindService(*Shead,105));
-    *Phead=InsertProfessional(*Phead,Pnode);
-
-    Pnode=CreateProfessional(203,"Priya Patel",440001,"9876543212");
-    AddServicetoProfessional(Pnode,FindService(*Shead,101));
-    AddServicetoProfessional(Pnode,FindService(*Shead,103));
-    AddServicetoProfessional(Pnode,FindService(*Shead,104));
-    *Phead=InsertProfessional(*Phead,Pnode);
+    Pnode=CreateProfessional(203,"Mahesh",440003,"9876500003");
+    if(Pnode!=NULL){
+        AddServicetoProfessional(Pnode,FindService(*Shead,101));
+        AddServicetoProfessional(Pnode,FindService(*Shead,105));
+        *Phead=InsertProfessional(*Phead,Pnode);
+    }
 
     printf("Test data loaded successfully.\n");
 }
-int main(){
-    int choice;
-    int subchoice;
 
-    CustomerNode*Chead=NULL;
-    ServiceNode*Shead=NULL;
-    ProfessionalNode*Phead=NULL;
-    RequestNode*Rhead=NULL;
+int main(void){
+    CustomerNode *Chead=NULL;
+    ServiceNode *Shead=NULL;
+    ProfessionalNode *Phead=NULL;
+    RequestNode *Rhead=NULL;
+
+    int choice=0;
+    int subChoice=0;
 
     LoadTestData(&Chead,&Shead,&Phead);
 
-    printf("\n");
-    printf("============================================\n");
-    printf("       URBAN COMPANY SERVICE SYSTEM\n");
-    printf("============================================\n");
-    printf("Welcome to Urban Company Service Management\n");
-    printf("============================================\n");
-
-    do{
-        printf("\n============================================\n");
-        printf("                 MAIN MENU\n");
-        printf("============================================\n");
+    while(choice!=4){
+        printf("\n====================================\n");
+        printf(" URBAN COMPANY SERVICE MANAGEMENT\n");
+        printf("====================================\n");
         printf("1. Customer Mode\n");
         printf("2. Professional Mode\n");
         printf("3. Admin Mode\n");
-        printf("0. Exit\n");
-        printf("--------------------------------------------\n");
+        printf("4. Exit\n");
         printf("Enter your choice: ");
         scanf("%d",&choice);
-        printf("--------------------------------------------\n");
 
         switch(choice){
-
             case 1:
-                do{
-                    printf("\n============================================\n");
-                    printf("               CUSTOMER MODE\n");
-                    printf("============================================\n");
+                subChoice=-1;
+                while(subChoice!=0){
+                    printf("\n----------- CUSTOMER MENU -----------\n");
                     printf("1. Register Customer\n");
                     printf("2. Create Service Request\n");
                     printf("3. Cancel Service Request\n");
                     printf("4. View Customer Requests\n");
-                    printf("0. Back to Main Menu\n");
-                    printf("--------------------------------------------\n");
+                    printf("0. Back\n");
                     printf("Enter your choice: ");
-                    scanf("%d",&subchoice);
-                    printf("--------------------------------------------\n");
+                    scanf("%d",&subChoice);
 
-                    switch(subchoice){
-
+                    switch(subChoice){
                         case 1:
                             Chead=RegisterCustomer(Chead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 2:
                             Rhead=CreateServiceRequest(Rhead,Phead,Shead,Chead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 3:
-                            Rhead=CancelRequest(Rhead,Chead);
-                            printf("--------------------------------------------\n");
+                            Rhead=CancelRequest(Rhead,Phead,Chead);
                             break;
 
                         case 4:
                             FindRequestsByCustomer(Rhead,Chead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 0:
-                            printf("Returning to Main Menu...\n");
-                            printf("============================================\n");
                             break;
 
                         default:
-                            printf("Invalid choice. Try again.\n");
-                            printf("--------------------------------------------\n");
+                            printf("Invalid choice.\n");
                     }
-
-                }while(subchoice!=0);
-
+                }
                 break;
 
             case 2:
-                do{
-                    printf("\n============================================\n");
-                    printf("             PROFESSIONAL MODE\n");
-                    printf("============================================\n");
+                subChoice=-1;
+                while(subChoice!=0){
+                    printf("\n--------- PROFESSIONAL MENU ---------\n");
                     printf("1. View Services Offered\n");
                     printf("2. Complete Service Request\n");
                     printf("3. View Service History\n");
-                    printf("0. Back to Main Menu\n");
-                    printf("--------------------------------------------\n");
+                    printf("0. Back\n");
                     printf("Enter your choice: ");
-                    scanf("%d",&subchoice);
-                    printf("--------------------------------------------\n");
+                    scanf("%d",&subChoice);
 
-                    switch(subchoice){
-
+                    switch(subChoice){
                         case 1:
                             FindServicesByProfessional(Phead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 2:
                             Rhead=CompleteRequest(Rhead,Phead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 3:
                             DisplayServiceHistory(Rhead,Phead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 0:
-                            printf("Returning to Main Menu...\n");
-                            printf("============================================\n");
                             break;
 
                         default:
-                            printf("Invalid choice. Try again.\n");
-                            printf("--------------------------------------------\n");
+                            printf("Invalid choice.\n");
                     }
-
-                }while(subchoice!=0);
-
+                }
                 break;
 
             case 3:
-                do{
-                    printf("\n============================================\n");
-                    printf("                 ADMIN MODE\n");
-                    printf("============================================\n");
+                subChoice=-1;
+                while(subChoice!=0){
+                    printf("\n------------- ADMIN MENU ------------\n");
                     printf("1. Add Service\n");
                     printf("2. Register Customer\n");
                     printf("3. Register Professional\n");
                     printf("4. Display All Services\n");
-                    printf("5. Find Professionals by Service\n");
-                    printf("6. Find Services by Professional\n");
-                    printf("7. Find Requests by Customer\n");
-                    printf("8. Display Pending Requests\n");
-                    printf("9. Display Service History\n");
-                    printf("0. Back to Main Menu\n");
-                    printf("--------------------------------------------\n");
+                    printf("5. Display All Professionals\n");
+                    printf("6. Find Professionals by Service\n");
+                    printf("7. Find Services by Professional\n");
+                    printf("8. Find Requests by Customer\n");
+                    printf("9. Display Pending Requests\n");
+                    printf("10. Display Service History\n");
+                    printf("11. Service Demand Report\n");
+                    printf("12. Professional Activity Report\n");
+                    printf("0. Back\n");
                     printf("Enter your choice: ");
-                    scanf("%d",&subchoice);
-                    printf("--------------------------------------------\n");
+                    scanf("%d",&subChoice);
 
-                    switch(subchoice){
-
+                    switch(subChoice){
                         case 1:
                             Shead=InputService(Shead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 2:
                             Chead=RegisterCustomer(Chead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 3:
                             Phead=RegisterProfessional(Phead,Shead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 4:
                             DisplayService(Shead);
-                            printf("--------------------------------------------\n");
                             break;
 
                         case 5:
-                            FindProfessionalsByService(Phead,Shead);
-                            printf("--------------------------------------------\n");
+                            DisplayProfessionals(Phead);
                             break;
 
                         case 6:
-                            FindServicesByProfessional(Phead);
-                            printf("--------------------------------------------\n");
+                            FindProfessionalsByService(Phead,Shead);
                             break;
 
                         case 7:
-                            FindRequestsByCustomer(Rhead,Chead);
-                            printf("--------------------------------------------\n");
+                            FindServicesByProfessional(Phead);
                             break;
 
                         case 8:
-                            DisplayPendingRequests(Rhead);
-                            printf("--------------------------------------------\n");
+                            FindRequestsByCustomer(Rhead,Chead);
                             break;
 
                         case 9:
+                            DisplayPendingRequests(Rhead);
+                            break;
+
+                        case 10:
                             DisplayServiceHistory(Rhead,Phead);
-                            printf("--------------------------------------------\n");
+                            break;
+
+                        case 11:
+                            ServiceDemandReport(Shead,Rhead);
+                            break;
+
+                        case 12:
+                            ProfessionalActivityReport(Phead,Rhead);
                             break;
 
                         case 0:
-                            printf("Returning to Main Menu...\n");
-                            printf("============================================\n");
                             break;
 
                         default:
-                            printf("Invalid choice. Try again.\n");
-                            printf("--------------------------------------------\n");
+                            printf("Invalid choice.\n");
                     }
-
-                }while(subchoice!=0);
-
+                }
                 break;
 
-            case 0:
-                printf("\n============================================\n");
-                printf("Thank you for using Urban Company!\n");
-                printf("Exiting the application...\n");
-                printf("============================================\n");
+            case 4:
+                printf("Exiting the program.\n");
                 break;
 
             default:
-                printf("Invalid choice. Please select again.\n");
-                printf("--------------------------------------------\n");
+                printf("Invalid choice.\n");
         }
+    }
 
-    }while(choice!=0);
     FreeAllLists(Chead,Shead,Phead,Rhead);
+
     return 0;
 }
